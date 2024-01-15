@@ -13,19 +13,9 @@ To set up your own repo:
 
 ## INSTALL ALL DEPENDENCIES
 
-Install the following dependencies:
+To install all dependecies:
 
-`npm install dotenv`
-
-`npm install pg`
-
-`npm install jest`
-
-`npm install pg-format`
-
-`npm install express`
-
-`npm install supertest`
+`npm install`
 
 
 ## RUN THE FILE
