@@ -10,3 +10,14 @@ exports.findCommentsByArticleId = (article_id) => {
       return rows;
     });
 };
+
+exports.insertCommentByArticleId = (article_id, data) => {
+  return db
+    .query(
+        `INSERT INTO comments (body, author, article_id) VALUES ($1, $2, $3) RETURNING *`,
+        [data.body, data.username, article_id]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};

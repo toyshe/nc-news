@@ -108,7 +108,7 @@ describe("app", () => {
     });
   });
   describe("GET /api/articles/:article_id/comments", () => {
-    test("GET 200: returns all the comments on an article given by article_id", () => {
+    test("GET 200: returns all the comments on an article given by article_id ordered by the most recent first", () => {
       return request(app)
         .get("/api/articles/1/comments")
         .expect(200)
@@ -124,6 +124,7 @@ describe("app", () => {
             expect(comment).toHaveProperty("author");
             expect(comment).toHaveProperty("body");
             expect(comment).toHaveProperty("article_id");
+            expect(comment.article_id).toBe(1);
           });
         });
     });
@@ -149,6 +150,60 @@ describe("app", () => {
         .expect(200)
         .then(({ body }) => {
           expect(body.comments).toEqual([]);
+        });
+    });
+  });
+  describe("POST /api/articles/:article_id/comments", () => {
+    test("POST 201: inserts a new comment to the db and returns the new comment back to the client", () => {
+      const newComment = {
+        username: "butter_bridge",
+        body: "Love this article!!!",
+      };
+      return request(app)
+        .post("/api/articles/2/comments")
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.comments.author).toBe("butter_bridge");
+          expect(body.comments.body).toBe("Love this article!!!");
+        });
+    });
+    test("POST 400: returns bad request if any required field in the comments body is empty", () => {
+      const newComment = {
+        username: "butter_bridge",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    test("GET 404: returns Not Found when given a non-existent article_id", () => {
+      const newComment = {
+        username: "butter_bridge",
+        body: "Love this article!!!"
+      };
+      return request(app)
+        .post("/api/articles/999/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid article_id");
+        });
+    });
+    test("GET 400: returns Bad Request when given an invalid article_id", () => {
+      const newComment = {
+        username: "butter_bridge",
+        body: "Love this article!!!"
+      };
+      return request(app)
+        .post("/api/articles/not-an-id/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
         });
     });
   });
