@@ -59,5 +59,21 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "inserts comments on an article by its id",
+    "queries": [],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 9,
+          "body": "Superficially charming",
+          "article_id": 1,
+          "author": "icellusedkars",
+          "votes": 0,
+          "created_at": "2020-01-01T03:08:00.000Z"
+        }
+      ]
+    }
   }
 }

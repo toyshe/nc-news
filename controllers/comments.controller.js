@@ -1,5 +1,8 @@
 const { findArticleById } = require("../models/article.model");
-const { findCommentsByArticleId } = require("../models/comments.model");
+const {
+  findCommentsByArticleId,
+  insertCommentByArticleId,
+} = require("../models/comments.model");
 
 exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
@@ -8,9 +11,24 @@ exports.getCommentsByArticleId = (req, res, next) => {
   const fetchComments = findCommentsByArticleId(article_id);
 
   Promise.all([fetchComments, checkArticleId])
-    .then((response) => {
-      const comments = response[0];
-      res.status(200).send({ comments });
+    .then(([fetchComments]) => {
+      res.status(200).send({ comments: fetchComments });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postCommentByArticleId = (req, res, next) => {
+  const { article_id } = req.params;
+  const data = req.body;
+
+  const checkArticleId = findArticleById(article_id);
+  const insertComments = insertCommentByArticleId(article_id, data);
+
+  Promise.all([insertComments, checkArticleId])
+    .then(([fetchComments]) => {
+      res.status(201).send({ comments: fetchComments });
     })
     .catch((err) => {
       next(err);
