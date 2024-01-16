@@ -5,7 +5,7 @@ exports.findArticleById = (id) => {
     .query(`SELECT * FROM articles WHERE article_id=$1`, [id])
     .then(({ rows }) => {
       if (rows.length === 0) {
-        return Promise.reject({ msg: "Invalid id" });
+        return Promise.reject({status: 404, msg: "Invalid article_id" });
       }
       return rows[0];
     });
