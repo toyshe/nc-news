@@ -5,7 +5,7 @@ exports.findArticleById = (id) => {
     .query(`SELECT * FROM articles WHERE article_id=$1`, [id])
     .then(({ rows }) => {
       if (rows.length === 0) {
-        return Promise.reject({status: 404, msg: "Invalid article_id" });
+        return Promise.reject({status: 404, msg: "article_id not found" });
       }
       return rows[0];
     });
@@ -23,3 +23,20 @@ exports.findArticles = () => {
         return rows
     });
 };
+
+exports.updateArticleById = (id, body) => {
+  return db.query(`SELECT * FROM articles WHERE article_id=$1`, [id]).then(({rows}) => {
+    
+    if(rows.length === 0){
+      return Promise.reject({status: 404, msg: "article_id not found"})
+    }
+    rows[0].votes += Number(body.inc_votes)
+    if(isNaN(rows[0].votes)){
+      return Promise.reject({status: 400, msg: "Invalid vote"})
+    }
+    else if(rows[0].votes < 0){
+      rows[0].votes = 0
+    }
+    return rows[0]
+  })
+}
