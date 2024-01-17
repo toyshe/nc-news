@@ -14,9 +14,12 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  findArticles().then((articles) => {
-    res.status(200).send({ articles });
-  });
+  const { topic } = req.query;
+  findArticles(topic)
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch(next);
 };
 
 exports.patchArticleById = (req, res, next) => {
@@ -28,4 +31,3 @@ exports.patchArticleById = (req, res, next) => {
     })
     .catch(next);
 };
-

@@ -55,13 +55,13 @@ describe("app", () => {
         author: "butter_bridge",
         body: "I find this existence challenging",
         created_at: "2020-07-09T20:11:00.000Z",
-        votes: 100
+        votes: 100,
       };
       return request(app)
         .get("/api/articles/1")
         .expect(200)
         .then(({ body }) => {
-          expect(body.article).toMatchObject(expectedOutput)
+          expect(body.article).toMatchObject(expectedOutput);
         });
     });
     test("GET 404: returns Not Found if entered invalid article_id", () => {
@@ -89,14 +89,14 @@ describe("app", () => {
         author: "butter_bridge",
         body: "I find this existence challenging",
         created_at: "2020-07-09T20:11:00.000Z",
-        votes: 101
+        votes: 101,
       };
       return request(app)
         .patch("/api/articles/1")
         .send(updatedContent)
         .expect(200)
         .then(({ body }) => {
-          expect(body.article).toMatchObject(expectedOutput)
+          expect(body.article).toMatchObject(expectedOutput);
         });
     });
     test("PATCH 400: return Invalid Vote if an invalid votes is given to be updated", () => {
@@ -140,15 +140,15 @@ describe("app", () => {
         });
     });
     test("PATCH 400: returns Bad request if body is empty or does not include inc_votes", () => {
-      const updatedContent = {}
+      const updatedContent = {};
       return request(app)
-      .patch('/api/articles/1')
-      .send(updatedContent)
-      .expect(400)
-      .then(({body}) => {
-        expect(body.msg).toBe("Invalid vote")
-      })
-    })
+        .patch("/api/articles/1")
+        .send(updatedContent)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid vote");
+        });
+    });
   });
   describe("/api/articles", () => {
     test("GET 200: returns all the articles ", () => {
@@ -171,6 +171,33 @@ describe("app", () => {
             expect(article).toHaveProperty("comment_count");
             expect(article).not.toHaveProperty("body");
           });
+        });
+    });
+    test("GET 200: return articles filtered by a query (topic)", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toHaveLength(12);
+          body.articles.forEach((article) => {
+            expect(article.topic).toBe("mitch");
+          });
+        });
+    });
+    test("GET 400: returns Bad Request if an invalid query is given", () => {
+      return request(app)
+        .get("/api/articles?topic=not-a-valid-query")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid query");
+        });
+    });
+    test("GET 200: returns empty array if query is valid but has no articles associated with it", () => {
+      return request(app)
+        .get("/api/articles?topic=paper")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toEqual([]);
         });
     });
   });
@@ -311,14 +338,17 @@ describe("app", () => {
   });
   describe("/api/users", () => {
     test("GET 200: returns all the users", () => {
-      return request(app).get('/api/users').expect(200).then(({body}) => {
-        expect(body.users).toHaveLength(4)
-        body.users.forEach((user) => {
-          expect(user).toHaveProperty("username")
-          expect(user).toHaveProperty("name")
-          expect(user).toHaveProperty("avatar_url")
-        })
-      })
-    })
-  })
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.users).toHaveLength(4);
+          body.users.forEach((user) => {
+            expect(user).toHaveProperty("username");
+            expect(user).toHaveProperty("name");
+            expect(user).toHaveProperty("avatar_url");
+          });
+        });
+    });
+  });
 });
