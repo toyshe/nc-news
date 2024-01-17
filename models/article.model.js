@@ -2,11 +2,12 @@ const db = require("../db/connection");
 
 exports.findArticleById = (id) => {
   return db
-    .query(`SELECT * FROM articles WHERE article_id=$1`, [id])
+    .query(`SELECT articles.*, COUNT(*) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id WHERE articles.article_id=$1 GROUP BY articles.article_id`, [id])
     .then(({ rows }) => {
       if (rows.length === 0) {
         return Promise.reject({ status: 404, msg: "article_id not found" });
       }
+      rows[0].comment_count = Number(rows[0].comment_count)
       return rows[0];
     });
 };
