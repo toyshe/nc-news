@@ -149,6 +149,21 @@ describe("app", () => {
           expect(body.msg).toBe("Invalid vote");
         });
     });
+    test("GET 200: returns the comment count of an article by id", () => {
+      const expectedOutput = {
+        article_id: 1,
+        title: "Living in the shadow of a great man",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "I find this existence challenging",
+        created_at: "2020-07-09T20:11:00.000Z",
+        votes: 100,
+        comment_count: 11
+      };
+      return request(app).get('/api/articles/1').expect(200).then(({body}) => {
+        expect(body.article).toMatchObject(expectedOutput)
+      })
+    })
   });
   describe("/api/articles", () => {
     test("GET 200: returns all the articles ", () => {
