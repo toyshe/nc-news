@@ -309,4 +309,16 @@ describe("app", () => {
         });
     });
   });
+  describe("/api/users", () => {
+    test("GET 200: returns all the users", () => {
+      return request(app).get('/api/users').expect(200).then(({body}) => {
+        expect(body.users).toHaveLength(4)
+        body.users.forEach((user) => {
+          expect(user).toHaveProperty("username")
+          expect(user).toHaveProperty("name")
+          expect(user).toHaveProperty("avatar_url")
+        })
+      })
+    })
+  })
 });
