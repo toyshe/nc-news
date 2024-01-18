@@ -2,17 +2,29 @@ const db = require("../db/connection");
 
 exports.findArticleById = (id) => {
   return db
-    .query(`SELECT articles.*, COUNT(*) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id WHERE articles.article_id=$1 GROUP BY articles.article_id`, [id])
+    .query(
+      `SELECT articles.*, COUNT(*) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id WHERE articles.article_id=$1 GROUP BY articles.article_id`,
+      [id]
+    )
     .then(({ rows }) => {
       if (rows.length === 0) {
         return Promise.reject({ status: 404, msg: "article_id not found" });
       }
-      rows[0].comment_count = Number(rows[0].comment_count)
+      rows[0].comment_count = Number(rows[0].comment_count);
       return rows[0];
     });
 };
 
-exports.findArticles = (topic) => {
+exports.findArticles = (topic, sort_by = "created_at", order = "desc") => {
+  const validSortQueries = ["title", "author", "created_at", "votes"];
+  if (!validSortQueries.includes(sort_by)) {
+    return Promise.reject({ status: 400, msg: "Invalid sort_by query" });
+  }
+
+  const validOrderQueries = ["asc", "desc"];
+  if(!validOrderQueries.includes(order)){
+    return Promise.reject({status: 400, msg: 'Invalid order query'})
+  }
 
   queryStr = `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, 
   COUNT(comments.comment_id) AS comment_count
@@ -20,12 +32,13 @@ exports.findArticles = (topic) => {
   LEFT JOIN comments ON articles.article_id = comments.article_id`;
 
   const queryParameters = [];
+
   if (topic) {
     queryStr += ` WHERE articles.topic=$1`;
     queryParameters.push(topic);
   }
 
-  queryStr += ` GROUP BY articles.article_id ORDER BY articles.created_at DESC`;
+  queryStr += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`;
 
   return db.query(queryStr, queryParameters).then(({ rows }) => {
     return rows;
