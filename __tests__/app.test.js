@@ -438,6 +438,28 @@ describe("app", () => {
           expect(body.msg).toBe("Bad Request");
         });
     });
+    test('GET 200: returns page 2 of the comments with limit 5', () => {
+      return request(app).get('/api/articles/1/comments?p=2').expect(200).then(({body}) => {
+        expect(body.total_count).toBe(5)
+        
+        const comment_id = [8, 6, 12, 3, 4]
+        for(let i = 0; i<body.comments.length; i++){
+          expect(body.comments[i].comment_id).toBe(comment_id[i])
+          expect(body.comments[i].article_id).toBe(1)
+        }
+        
+      })
+    })
+    test('GET 400: responds with Bad request if page is an invalid or less than 0', () => {
+      return request(app).get('/api/articles/2/comments?p=not-a-number').expect(400).then(({body}) => {
+        expect(body.msg).toBe('Invalid page query')
+      })
+    })
+    test('GET 400: responds with Bad request if limit is an invalid or less than 0', () => {
+      return request(app).get('/api/articles/2/comments?limit=-2').expect(400).then(({body}) => {
+        expect(body.msg).toBe('Invalid limit query')
+      })
+    })
   });
   describe("/api/comments/:comment_id", () => {
     test("DELETE 204: deletes comment by comment id", () => {
