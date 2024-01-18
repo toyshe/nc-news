@@ -22,8 +22,8 @@ exports.findArticles = (topic, sort_by = "created_at", order = "desc") => {
   }
 
   const validOrderQueries = ["asc", "desc"];
-  if(!validOrderQueries.includes(order)){
-    return Promise.reject({status: 400, msg: 'Invalid order query'})
+  if (!validOrderQueries.includes(order)) {
+    return Promise.reject({ status: 400, msg: "Invalid order query" });
   }
 
   queryStr = `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, 
@@ -58,6 +58,25 @@ exports.updateArticleById = (id, body) => {
       } else if (rows[0].votes < 0) {
         rows[0].votes = 0;
       }
+      return rows[0];
+    });
+};
+
+exports.insertArticle = ({title, topic, author, body, article_img_url}) => {
+  if(article_img_url === undefined){
+    article_img_url = 'https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700'
+  }
+  return db
+    .query(
+      `INSERT INTO articles (title, topic, author, body, article_img_url) VALUES ($1, $2, $3, $4, $5) RETURNING *, (
+        SELECT COUNT(*)
+        FROM comments
+        WHERE comments.article_id = articles.article_id
+      ) AS comment_count`,
+      [title, topic, author, body, article_img_url]
+    )
+    .then(({ rows }) => {
+      rows[0].comment_count = Number(rows[0].comment_count)
       return rows[0];
     });
 };
