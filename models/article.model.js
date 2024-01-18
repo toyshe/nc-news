@@ -15,7 +15,13 @@ exports.findArticleById = (id) => {
     });
 };
 
-exports.findArticles = (topic, sort_by = "created_at", order = "desc", limit=10, p) => {
+exports.findArticles = (
+  topic,
+  sort_by = "created_at",
+  order = "desc",
+  limit = 10,
+  p
+) => {
   const validSortQueries = ["title", "author", "created_at", "votes"];
   if (!validSortQueries.includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "Invalid sort_by query" });
@@ -40,15 +46,12 @@ exports.findArticles = (topic, sort_by = "created_at", order = "desc", limit=10,
 
   queryStr += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`;
 
-  if(p){
-    queryStr += ` LIMIT ${limit} OFFSET ${
-      limit * (p - 1)}`
-
+  if (p) {
+    queryStr += ` LIMIT ${limit} OFFSET ${limit * (p - 1)}`;
   }
 
   return db.query(queryStr, queryParameters).then(({ rows }) => {
     return rows;
-
   });
 };
 
@@ -69,9 +72,10 @@ exports.updateArticleById = (id, body) => {
     });
 };
 
-exports.insertArticle = ({title, topic, author, body, article_img_url}) => {
-  if(article_img_url === undefined){
-    article_img_url = 'https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700'
+exports.insertArticle = ({ title, topic, author, body, article_img_url }) => {
+  if (article_img_url === undefined) {
+    article_img_url =
+      "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700";
   }
   return db
     .query(
@@ -83,7 +87,17 @@ exports.insertArticle = ({title, topic, author, body, article_img_url}) => {
       [title, topic, author, body, article_img_url]
     )
     .then(({ rows }) => {
-      rows[0].comment_count = Number(rows[0].comment_count)
+      rows[0].comment_count = Number(rows[0].comment_count);
       return rows[0];
+    });
+};
+
+exports.removeArticleById = (article_id) => {
+  return db
+    .query(`DELETE FROM articles WHERE article_id=$1`, [article_id])
+    .then((response) => {
+      if (response.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "article_id not found" });
+      }
     });
 };

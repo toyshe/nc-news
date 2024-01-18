@@ -3,6 +3,7 @@ const {
   findArticles,
   updateArticleById,
   insertArticle,
+  removeArticleById,
 } = require("../models/article.model");
 const { checkTopicExists, checkPValid, checkLimitValid } = require("../utils/check-exists");
 
@@ -65,3 +66,10 @@ exports.postArticle = (req, res, next) => {
       next(err);
     });
 };
+
+exports.deleteArticleById = (req, res, next) => {
+  const {article_id} = req.params;
+  removeArticleById(article_id).then(() => {
+    res.sendStatus(204)
+  }).catch(next)
+}

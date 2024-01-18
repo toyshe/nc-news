@@ -183,6 +183,23 @@ describe("app", () => {
           expect(body.article.comment_count).toBe(11);
         });
     });
+    test("DELETE 204: deletes an article by its id", () => {
+      return request(app).delete("/api/articles/2").expect(204);
+    });
+    test("DELETE 400: returns Bad request if id is invalid", () => {
+      return request(app)
+        .delete("/api/articles/not-a-valid-id")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    test("DELETE 404: returns article_id not found when given a non-existent id", () => {
+      return request(app)
+        .delete("/api/articles/20000")
+        .expect(404)
+        .then(({ body }) => expect(body.msg).toBe("article_id not found"));
+    });
   });
   describe("/api/articles", () => {
     test("GET 200: returns all the articles ", () => {
