@@ -80,7 +80,7 @@
     "description": "updates votes on an articly by its id",
     "queries": [],
     "exampleResponse": {
-      "comments": [
+      "articles": [
         {
           "article_id": 1,
           "title": "Living in the shadow of a great man",
@@ -129,7 +129,7 @@
           "votes": 16,
           "author": "butter_bridge",
           "article_id": 9,
-          "created_at": 1586179020000
+          "created_at": "2020-07-09T20:11:00.000Z"
         }
       ]
     }
