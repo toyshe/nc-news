@@ -296,6 +296,34 @@ describe("app", () => {
           expect(body.msg).toBe("Bad Request");
         });
     });
+    test('GET 200: returns page 2 of the articles with default limit of 10', () => {
+      return request(app).get('/api/articles?p=2').expect(200).then(({body}) => {
+        expect(body.total_count).toBe(3)
+        const titles = ['Does Mitch predate civilisation?', 'Am I a cat?', 'Z']
+        for(let i = 0; i< body.articles.length -1; i++){
+          expect(body.articles[i].title).toBe(titles[i])
+        }
+      })
+    })
+    test('GET 200: returns page 2 of the articles with limit 5', () => {
+      return request(app).get('/api/articles?limit=5&p=2').expect(200).then(({body}) => {
+        expect(body.total_count).toBe(5)
+        const article_id = [5, 1, 9, 10, 4]
+        for(let i = 0; i<body.articles.length; i++){
+          expect(body.articles[i].article_id).toBe(article_id[i])
+        }
+      })
+    })
+    test('GET 400: responds with Bad request if page is an invalid or less than 0', () => {
+      return request(app).get('/api/articles?p=not-a-number').expect(400).then(({body}) => {
+        expect(body.msg).toBe('Invalid page query')
+      })
+    })
+    test('GET 400: responds with Bad request if limit is an invalid or less than 0', () => {
+      return request(app).get('/api/articles?limit=-2').expect(400).then(({body}) => {
+        expect(body.msg).toBe('Invalid limit query')
+      })
+    })
   });
   describe("/api/articles/:article_id/comments", () => {
     test("GET 200: returns all the comments on an article given by article_id ordered by the most recent first", () => {
