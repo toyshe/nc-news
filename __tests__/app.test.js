@@ -377,6 +377,73 @@ describe("app", () => {
           expect(body.msg).toBe("comment_id not found");
         });
     });
+    test("PATCH 200: updates vote and returns updated comment by comment_id", () => {
+      const updatedContent = { inc_votes: 2 };
+      return request(app)
+        .patch("/api/comments/2")
+        .send(updatedContent)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comment).toMatchObject({
+            comment_id: 2,
+            article_id: 1,
+            author: "butter_bridge",
+            votes: 16,
+          });
+          expect(body.comment).toHaveProperty("body");
+          expect(body.comment).toHaveProperty("created_at");
+        });
+    });
+    test("PATCH 400: returns Bad request if an invalid vote is given", () => {
+      const updatedContent = { inc_votes: "not-a-valid-vote" };
+      return request(app)
+        .patch("/api/comments/2")
+        .send(updatedContent)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid vote");
+        });
+    });
+    test("PATCH 404: returns Not Found when given a non-existent article_id", () => {
+      const updatedContent = { inc_votes: 2 };
+      return request(app)
+        .patch("/api/comments/999")
+        .send(updatedContent)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("comment_id not found");
+        });
+    });
+    test("PATCH 400: returns Bad Request when given an invalid article_id", () => {
+      const updatedContent = { inc_votes: 2 };
+      return request(app)
+        .patch("/api/comments/not-an-id")
+        .send(updatedContent)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    test("PATCH 200: defaults to 0 if the updated vote is in negatives", () => {
+      const updatedContent = { inc_votes: -200 };
+      return request(app)
+        .patch("/api/comments/1")
+        .send(updatedContent)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comment.votes).toBe(0);
+        });
+    });
+    test("PATCH 400: returns Bad request if body is empty or does not include inc_votes", () => {
+      const updatedContent = {};
+      return request(app)
+        .patch("/api/comments/1")
+        .send(updatedContent)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid vote");
+        });
+    });
   });
   describe("/api/users", () => {
     test("GET 200: returns all the users", () => {
