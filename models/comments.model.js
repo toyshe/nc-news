@@ -14,8 +14,8 @@ exports.findCommentsByArticleId = (article_id) => {
 exports.insertCommentByArticleId = (article_id, data) => {
   return db
     .query(
-        `INSERT INTO comments (body, author, article_id) VALUES ($1, $2, $3) RETURNING *`,
-        [data.body, data.username, article_id]
+      `INSERT INTO comments (body, author, article_id) VALUES ($1, $2, $3) RETURNING *`,
+      [data.body, data.username, article_id]
     )
     .then(({ rows }) => {
       return rows[0];
@@ -23,10 +23,28 @@ exports.insertCommentByArticleId = (article_id, data) => {
 };
 
 exports.removeCommentById = (comment_id) => {
-  return db.query(`DELETE FROM comments WHERE comment_id = $1`, [comment_id])
-  .then((response) => {
-    if(response.rowCount === 0){
-      return Promise.reject({status: 404, msg: "comment_id not found"})
-    }
-  })
-}
+  return db
+    .query(`DELETE FROM comments WHERE comment_id = $1`, [comment_id])
+    .then((response) => {
+      if (response.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "comment_id not found" });
+      }
+    });
+};
+
+exports.updateCommentById = (comment_id, body) => {
+  return db
+    .query(`SELECT * FROM comments WHERE comment_id=$1`, [comment_id])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "comment_id not found" });
+      }
+      rows[0].votes += body.inc_votes;
+      if (isNaN(rows[0].votes)) {
+        return Promise.reject({ status: 400, msg: "Invalid vote" });
+      } else if (rows[0].votes < 0) {
+        rows[0].votes = 0;
+      }
+      return rows[0];
+    });
+};
