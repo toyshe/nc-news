@@ -3,6 +3,7 @@ const {
   findArticles,
   updateArticleById,
 } = require("../models/article.model");
+const { checkTopicExists } = require("../utils/check-exists");
 
 exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params;
@@ -15,9 +16,17 @@ exports.getArticleById = (req, res, next) => {
 
 exports.getArticles = (req, res, next) => {
   const { topic } = req.query;
-  findArticles(topic)
-    .then((articles) => {
-      res.status(200).send({ articles });
+
+  const fetchQuery = findArticles(topic);
+  const queries = [fetchQuery];
+  if (topic) {
+    const topicExistenceQuery = checkTopicExists(topic);
+    queries.push(topicExistenceQuery);
+  }
+
+  Promise.all(queries)
+    .then(([fetchQuery]) => {
+      res.status(200).send({ articles: fetchQuery });
     })
     .catch(next);
 };
