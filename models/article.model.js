@@ -15,7 +15,7 @@ exports.findArticleById = (id) => {
     });
 };
 
-exports.findArticles = (topic, sort_by = "created_at", order = "desc") => {
+exports.findArticles = (topic, sort_by = "created_at", order = "desc", limit=10, p) => {
   const validSortQueries = ["title", "author", "created_at", "votes"];
   if (!validSortQueries.includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "Invalid sort_by query" });
@@ -40,8 +40,15 @@ exports.findArticles = (topic, sort_by = "created_at", order = "desc") => {
 
   queryStr += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`;
 
+  if(p){
+    queryStr += ` LIMIT ${limit} OFFSET ${
+      limit * (p - 1)}`
+
+  }
+
   return db.query(queryStr, queryParameters).then(({ rows }) => {
     return rows;
+
   });
 };
 
