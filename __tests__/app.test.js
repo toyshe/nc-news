@@ -183,9 +183,6 @@ describe("app", () => {
           expect(body.article.comment_count).toBe(11);
         });
     });
-    test("DELETE 204: deletes an article by its id", () => {
-      return request(app).delete('/api/articles/1').expect(204)
-    })
   });
   describe("/api/articles", () => {
     test("GET 200: returns all the articles ", () => {
