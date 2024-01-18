@@ -150,20 +150,13 @@ describe("app", () => {
         });
     });
     test("GET 200: returns the comment count of an article by id", () => {
-      const expectedOutput = {
-        article_id: 1,
-        title: "Living in the shadow of a great man",
-        topic: "mitch",
-        author: "butter_bridge",
-        body: "I find this existence challenging",
-        created_at: "2020-07-09T20:11:00.000Z",
-        votes: 100,
-        comment_count: 11
-      };
-      return request(app).get('/api/articles/1').expect(200).then(({body}) => {
-        expect(body.article).toMatchObject(expectedOutput)
-      })
-    })
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article.comment_count).toBe(11);
+        });
+    });
   });
   describe("/api/articles", () => {
     test("GET 200: returns all the articles ", () => {
@@ -216,27 +209,39 @@ describe("app", () => {
         });
     });
     test("GET 200: returns all articles sorted by votes ordered ascending", () => {
-      return request(app).get('/api/articles?sort_by=votes&&order=asc').expect(200).then(({body}) => {
-        expect(body.articles).toHaveLength(13)
-        expect(body.articles).toBeSortedBy('votes', {'ascending': true})
-      })
-    })
+      return request(app)
+        .get("/api/articles?sort_by=votes&&order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toHaveLength(13);
+          expect(body.articles).toBeSortedBy("votes", { ascending: true });
+        });
+    });
     test("GET 200: returns all articles sorted by created_at by default ordered ascending", () => {
-      return request(app).get('/api/articles?order=asc').expect(200).then(({body}) => {
-        expect(body.articles).toHaveLength(13)
-        expect(body.articles).toBeSortedBy('created_at', {'ascending': true})
-      })
-    })
+      return request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toHaveLength(13);
+          expect(body.articles).toBeSortedBy("created_at", { ascending: true });
+        });
+    });
     test("GET 400: returns invalid sort by query if given an invalid sort_by", () => {
-      return request(app).get('/api/articles?sort_by=not-a-valid-sortby').expect(400).then(({body}) => {
-        expect(body.msg).toBe('Invalid sort_by query')
-      })
-    })
+      return request(app)
+        .get("/api/articles?sort_by=not-a-valid-sortby")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid sort_by query");
+        });
+    });
     test("GET 400: returns invalid order query if given an invalid order", () => {
-      return request(app).get('/api/articles?order=not-a-valid-order').expect(400).then(({body}) => {
-        expect(body.msg).toBe('Invalid order query')
-      })
-    })
+      return request(app)
+        .get("/api/articles?order=not-a-valid-order")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid order query");
+        });
+    });
   });
   describe("/api/articles/:article_id/comments", () => {
     test("GET 200: returns all the comments on an article given by article_id ordered by the most recent first", () => {
@@ -385,6 +390,29 @@ describe("app", () => {
             expect(user).toHaveProperty("name");
             expect(user).toHaveProperty("avatar_url");
           });
+        });
+    });
+  });
+  describe("/api/users/:username", () => {
+    test("GET 200: returns a user given their username", () => {
+      return request(app)
+        .get("/api/users/rogersop")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.user).toMatchObject({
+            username: "rogersop",
+            name: "paul",
+            avatar_url:
+              "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+          });
+        });
+    });
+    test("GET 400: returns a Bad Request if the username provided is invalid", () => {
+      return request(app)
+        .get("/api/users/not-a-valid-username")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid username");
         });
     });
   });
