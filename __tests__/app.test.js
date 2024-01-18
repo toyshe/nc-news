@@ -242,6 +242,60 @@ describe("app", () => {
           expect(body.msg).toBe("Invalid order query");
         });
     });
+    test("POST 201: returns the newly inserted article - expect article_img_url to default when not provided", () => {
+      const newComment = {
+        title: "How much I hate writing code on paper",
+        topic: "paper",
+        author: "butter_bridge",
+        body: "I really hate writing code on paper",
+      };
+      const expectedOutput = {
+        article_id: 14,
+        author: "butter_bridge",
+        title: "How much I hate writing code on paper",
+        body: "I really hate writing code on paper",
+        topic: "paper",
+        votes: 0,
+        comment_count: 0,
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.article).toMatchObject(expectedOutput);
+          expect(typeof body.article.created_at).toBe("string");
+        });
+    });
+    test("POST 400: returns bad request if any required field in the comments body is empty", () => {
+      const newComment = {
+        title: "How much I hate writing code on paper",
+        topic: "paper",
+        body: "I really hate writing code on paper",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    test("POST 400: returns Bad Request if one of the field's given contains the wrong value type or if foreign key username doesn't exist", () => {
+      const newComment = {
+        title: "How much I hate writing code on paper",
+        topic: 5,
+        author: "butter_bridge",
+        body: "I really hate writing code on paper",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
   });
   describe("/api/articles/:article_id/comments", () => {
     test("GET 200: returns all the comments on an article given by article_id ordered by the most recent first", () => {

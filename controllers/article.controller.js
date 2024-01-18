@@ -2,6 +2,7 @@ const {
   findArticleById,
   findArticles,
   updateArticleById,
+  insertArticle,
 } = require("../models/article.model");
 const { checkTopicExists } = require("../utils/check-exists");
 
@@ -39,4 +40,15 @@ exports.patchArticleById = (req, res, next) => {
       res.status(200).send({ article });
     })
     .catch(next);
+};
+
+exports.postArticle = (req, res, next) => {
+  const body = req.body;
+  insertArticle(body)
+    .then((article) => {
+      res.status(201).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
