@@ -1,6 +1,6 @@
 const db = require("../db/connection");
 
-exports.findCommentsByArticleId = (article_id, limit = 5, p) => {
+exports.findCommentsByArticleId = (article_id, limit = 10, p) => {
   let queryStr = `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`;
 
   const queryParameters = [article_id];
