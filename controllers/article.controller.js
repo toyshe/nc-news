@@ -15,9 +15,9 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  const { topic } = req.query;
+  const { topic, sort_by, order } = req.query;
 
-  const fetchQuery = findArticles(topic);
+  const fetchQuery = findArticles(topic, sort_by, order);
   const queries = [fetchQuery];
   if (topic) {
     const topicExistenceQuery = checkTopicExists(topic);

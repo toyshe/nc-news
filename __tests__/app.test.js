@@ -215,6 +215,28 @@ describe("app", () => {
           expect(body.articles).toEqual([]);
         });
     });
+    test("GET 200: returns all articles sorted by votes ordered ascending", () => {
+      return request(app).get('/api/articles?sort_by=votes&&order=asc').expect(200).then(({body}) => {
+        expect(body.articles).toHaveLength(13)
+        expect(body.articles).toBeSortedBy('votes', {'ascending': true})
+      })
+    })
+    test("GET 200: returns all articles sorted by created_at by default ordered ascending", () => {
+      return request(app).get('/api/articles?order=asc').expect(200).then(({body}) => {
+        expect(body.articles).toHaveLength(13)
+        expect(body.articles).toBeSortedBy('created_at', {'ascending': true})
+      })
+    })
+    test("GET 400: returns invalid sort by query if given an invalid sort_by", () => {
+      return request(app).get('/api/articles?sort_by=not-a-valid-sortby').expect(400).then(({body}) => {
+        expect(body.msg).toBe('Invalid sort_by query')
+      })
+    })
+    test("GET 400: returns invalid order query if given an invalid order", () => {
+      return request(app).get('/api/articles?order=not-a-valid-order').expect(400).then(({body}) => {
+        expect(body.msg).toBe('Invalid order query')
+      })
+    })
   });
   describe("/api/articles/:article_id/comments", () => {
     test("GET 200: returns all the comments on an article given by article_id ordered by the most recent first", () => {
