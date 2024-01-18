@@ -1,14 +1,17 @@
 const db = require("../db/connection");
 
-exports.findCommentsByArticleId = (article_id) => {
-  return db
-    .query(
-      `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`,
-      [article_id]
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+exports.findCommentsByArticleId = (article_id, limit = 5, p) => {
+  let queryStr = `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`;
+
+  const queryParameters = [article_id];
+
+  if (p) {
+    queryStr += ` LIMIT ${limit} OFFSET ${limit * (p - 1)}`;
+  }
+
+  return db.query(queryStr, queryParameters).then(({ rows }) => {
+    return rows;
+  });
 };
 
 exports.insertCommentByArticleId = (article_id, data) => {

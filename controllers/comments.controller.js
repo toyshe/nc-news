@@ -5,16 +5,32 @@ const {
   removeCommentById,
   updateCommentById,
 } = require("../models/comments.model");
+const { checkPValid, checkLimitValid } = require("../utils/check-exists");
 
 exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
+  const { limit, p } = req.query;
 
   const checkArticleId = findArticleById(article_id);
-  const fetchComments = findCommentsByArticleId(article_id);
+  const fetchComments = findCommentsByArticleId(article_id, limit, p);
 
-  Promise.all([fetchComments, checkArticleId])
+  const queries = [fetchComments, checkArticleId];
+
+  if (p) {
+    const pageValidityQuery = checkPValid(p);
+    queries.push(pageValidityQuery);
+  }
+
+  if (limit) {
+    const limitValidityQuery = checkLimitValid(limit);
+    queries.push(limitValidityQuery);
+  }
+
+  Promise.all(queries)
     .then(([fetchComments]) => {
-      res.status(200).send({ comments: fetchComments });
+      res
+        .status(200)
+        .send({ comments: fetchComments, total_count: fetchComments.length });
     })
     .catch((err) => {
       next(err);
