@@ -45,6 +45,32 @@ describe("app", () => {
     test("GET 404: expect a 404 status code if an invalid route is given", () => {
       return request(app).get("/api/not-valid-route").expect(404);
     });
+    test("POST 201: returns the newly inserted content", () => {
+      const newTopic = {
+        slug: "games",
+        description: "what people play for entertainment",
+      };
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.topic.slug).toBe("games");
+          expect(body.topic.description).toBe(
+            "what people play for entertainment"
+          );
+        });
+    });
+    test("POST 400: returns Bad request if one of the not nullable fields was missing", () => {
+      const newTopic = { description: "just an empty topic" };
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
   });
   describe("/api/articles/:article_id", () => {
     test("GET 200: returns an article from article_id", () => {
@@ -296,34 +322,50 @@ describe("app", () => {
           expect(body.msg).toBe("Bad Request");
         });
     });
-    test('GET 200: returns page 2 of the articles with default limit of 10', () => {
-      return request(app).get('/api/articles?p=2').expect(200).then(({body}) => {
-        expect(body.total_count).toBe(3)
-        const titles = ['Does Mitch predate civilisation?', 'Am I a cat?', 'Z']
-        for(let i = 0; i< body.articles.length -1; i++){
-          expect(body.articles[i].title).toBe(titles[i])
-        }
-      })
-    })
-    test('GET 200: returns page 2 of the articles with limit 5', () => {
-      return request(app).get('/api/articles?limit=5&p=2').expect(200).then(({body}) => {
-        expect(body.total_count).toBe(5)
-        const article_id = [5, 1, 9, 10, 4]
-        for(let i = 0; i<body.articles.length; i++){
-          expect(body.articles[i].article_id).toBe(article_id[i])
-        }
-      })
-    })
-    test('GET 400: responds with Bad request if page is an invalid or less than 0', () => {
-      return request(app).get('/api/articles?p=not-a-number').expect(400).then(({body}) => {
-        expect(body.msg).toBe('Invalid page query')
-      })
-    })
-    test('GET 400: responds with Bad request if limit is an invalid or less than 0', () => {
-      return request(app).get('/api/articles?limit=-2').expect(400).then(({body}) => {
-        expect(body.msg).toBe('Invalid limit query')
-      })
-    })
+    test("GET 200: returns page 2 of the articles with default limit of 10", () => {
+      return request(app)
+        .get("/api/articles?p=2")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.total_count).toBe(3);
+          const titles = [
+            "Does Mitch predate civilisation?",
+            "Am I a cat?",
+            "Z",
+          ];
+          for (let i = 0; i < body.articles.length - 1; i++) {
+            expect(body.articles[i].title).toBe(titles[i]);
+          }
+        });
+    });
+    test("GET 200: returns page 2 of the articles with limit 5", () => {
+      return request(app)
+        .get("/api/articles?limit=5&p=2")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.total_count).toBe(5);
+          const article_id = [5, 1, 9, 10, 4];
+          for (let i = 0; i < body.articles.length; i++) {
+            expect(body.articles[i].article_id).toBe(article_id[i]);
+          }
+        });
+    });
+    test("GET 400: responds with Bad request if page is an invalid or less than 0", () => {
+      return request(app)
+        .get("/api/articles?p=not-a-number")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid page query");
+        });
+    });
+    test("GET 400: responds with Bad request if limit is an invalid or less than 0", () => {
+      return request(app)
+        .get("/api/articles?limit=-2")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid limit query");
+        });
+    });
   });
   describe("/api/articles/:article_id/comments", () => {
     test("GET 200: returns all the comments on an article given by article_id ordered by the most recent first", () => {
@@ -438,28 +480,35 @@ describe("app", () => {
           expect(body.msg).toBe("Bad Request");
         });
     });
-    test('GET 200: returns page 2 of the comments with limit 5', () => {
-      return request(app).get('/api/articles/1/comments?p=2').expect(200).then(({body}) => {
-        expect(body.total_count).toBe(5)
-        
-        const comment_id = [8, 6, 12, 3, 4]
-        for(let i = 0; i<body.comments.length; i++){
-          expect(body.comments[i].comment_id).toBe(comment_id[i])
-          expect(body.comments[i].article_id).toBe(1)
-        }
-        
-      })
-    })
-    test('GET 400: responds with Bad request if page is an invalid or less than 0', () => {
-      return request(app).get('/api/articles/2/comments?p=not-a-number').expect(400).then(({body}) => {
-        expect(body.msg).toBe('Invalid page query')
-      })
-    })
-    test('GET 400: responds with Bad request if limit is an invalid or less than 0', () => {
-      return request(app).get('/api/articles/2/comments?limit=-2').expect(400).then(({body}) => {
-        expect(body.msg).toBe('Invalid limit query')
-      })
-    })
+    test("GET 200: returns page 2 of the comments with limit 5", () => {
+      return request(app)
+        .get("/api/articles/1/comments?p=2")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.total_count).toBe(1);
+          const comment_id = [9];
+          for (let i = 0; i < body.comments.length; i++) {
+            expect(body.comments[i].comment_id).toBe(comment_id[i]);
+            expect(body.comments[i].article_id).toBe(1);
+          }
+        });
+    });
+    test("GET 400: responds with Bad request if page is an invalid or less than 0", () => {
+      return request(app)
+        .get("/api/articles/2/comments?p=not-a-number")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid page query");
+        });
+    });
+    test("GET 400: responds with Bad request if limit is an invalid or less than 0", () => {
+      return request(app)
+        .get("/api/articles/2/comments?limit=-2")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid limit query");
+        });
+    });
   });
   describe("/api/comments/:comment_id", () => {
     test("DELETE 204: deletes comment by comment id", () => {
