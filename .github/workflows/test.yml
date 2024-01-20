@@ -20,8 +20,8 @@ jobs:
     needs: test-utils
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout and clone repo
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3.6.0
       - name: Setup PSQL
         uses: harmon758/postgresql-action@v1
         with: 
