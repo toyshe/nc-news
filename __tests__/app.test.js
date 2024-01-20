@@ -81,6 +81,7 @@ describe("app", () => {
         author: "butter_bridge",
         body: "I find this existence challenging",
         created_at: "2020-07-09T20:11:00.000Z",
+        comment_count: 11,
         votes: 100,
         article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
       };
@@ -88,7 +89,7 @@ describe("app", () => {
         .get("/api/articles/1")
         .expect(200)
         .then(({ body }) => {
-          expect(body.article).toMatchObject(expectedOutput);
+          expect(body.article).toEqual(expectedOutput);
         });
     });
     test("GET 404: returns Not Found if entered invalid article_id", () => {
@@ -125,7 +126,7 @@ describe("app", () => {
         .expect(200)
         .then(({ body }) => {
           console.log(body.article);
-          expect(body.article).toMatchObject(expectedOutput);
+          expect(body.article).toEqual(expectedOutput);
         });
     });
     test("PATCH 400: return Invalid Vote if an invalid votes is given to be updated", () => {
