@@ -122,6 +122,7 @@ describe("app", () => {
         .send(updatedContent)
         .expect(200)
         .then(({ body }) => {
+          console.log(body.article);
           expect(body.article).toMatchObject(expectedOutput);
         });
     });

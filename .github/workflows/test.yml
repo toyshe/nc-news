@@ -25,10 +25,10 @@ jobs:
       - name: Setup PSQL
         uses: harmon758/postgresql-action@v1
         with: 
-          postgresql db: test_db
+          postgresql db: nc_news_test
           postgresql user: toyshe
           postgresql password: password
       - name: Install dependencies
         run: npm install
       - name: Test app
-        run: PGDATABASE=test_db PGUSER=toyshe PGPASSWORD=password npm test
+        run: PGDATABASE=nc_news_test PGUSER=toyshe PGPASSWORD=password npm test
