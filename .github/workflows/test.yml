@@ -1,9 +1,9 @@
-name: Test & Deploy
+name: Test
 
 on: 
   pull_request:
     branches:
-      -main
+      - main
 
 jobs:
   test-utils:
