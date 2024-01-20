@@ -73,3 +73,11 @@ The following is _not_ a comprehensive list! Its purpose is just to get the ball
 ### DELETE `/api/comments/:comment_id`
 
 - ???
+
+
+# all the comments (?)
+# all the comments written by a user
+# most voted comment from a user
+# change the previous tests which didn't allow negative votes - downvotes 
+# all the articles under a topic
+# 
