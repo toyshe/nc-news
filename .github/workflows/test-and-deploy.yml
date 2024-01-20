@@ -33,7 +33,6 @@ jobs:
       - name: Test app
         run: PGDATABASE=test_db PGUSER=toyshe PGPASSWORD=password npm test
 
-
 # all the comments (?)
 # all the comments written by a user
 # most voted comment from a user
