@@ -1,0 +1,42 @@
+name: Test & Deploy
+
+on: 
+  pull_request:
+    branches:
+      -main
+
+jobs:
+  test-utils:
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Checkout and clone repo
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: npm install
+      - name: Test utils
+        run: npm run test-utils
+  
+  test-app:
+    needs: test-utils
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout and clone repo
+        uses: actions/checkout@v3
+      - name: Setup PSQL
+        uses: harmon758/postgresql-action@v1
+        with: 
+          postgresql db: test_db
+          postgresql user: toyshe
+          postgresql password: password
+      - name: Install dependencies
+        run: npm install
+      - name: Test app
+        run: PGDATABASE=test_db PGUSER=toyshe PGPASSWORD=password npm test
+
+
+# all the comments (?)
+# all the comments written by a user
+# most voted comment from a user
+# change the previous tests which didn't allow negative votes - downvotes 
+# all the articles under a topic
+# 
