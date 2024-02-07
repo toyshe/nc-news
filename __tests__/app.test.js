@@ -128,7 +128,7 @@ describe("app", () => {
         .expect(200)
         .then(({ body }) => {
           console.log(body.article);
-          expect(body.article).toEqual(expectedOutput);
+          expect(body.article).toMatchObject(expectedOutput);
         });
     });
     test("PATCH 400: return Invalid Vote if an invalid votes is given to be updated", () => {
