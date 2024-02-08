@@ -138,7 +138,7 @@ describe("app", () => {
         .send(updatedContent)
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe("Invalid vote");
+          expect(body.msg).toBe("Bad Request");
         });
     });
     test("PATCH 404: returns Not Found when given a non-existent article_id", () => {
@@ -168,7 +168,7 @@ describe("app", () => {
         .send(updatedContent)
         .expect(200)
         .then(({ body }) => {
-          expect(body.article.votes).toBe(0);
+          expect(body.article.votes).toBe(-100);
         });
     });
     test("PATCH 400: returns Bad request if body is empty or does not include inc_votes", () => {
@@ -178,7 +178,7 @@ describe("app", () => {
         .send(updatedContent)
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe("Invalid vote");
+          expect(body.msg).toBe("Bad Request");
         });
     });
     test("GET 200: returns the comment count of an article by id", () => {
