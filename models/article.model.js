@@ -57,16 +57,10 @@ exports.findArticles = (
 
 exports.updateArticleById = (id, body) => {
   return db
-    .query(`SELECT articles.*, COUNT(*) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id WHERE articles.article_id=$1 GROUP BY articles.article_id`, [id])
+    .query(`UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`, [body.inc_votes,id])
     .then(({ rows }) => {
       if (rows.length === 0) {
         return Promise.reject({ status: 404, msg: "article_id not found" });
-      }
-      rows[0].votes += Number(body.inc_votes);
-      if (isNaN(rows[0].votes)) {
-        return Promise.reject({ status: 400, msg: "Invalid vote" });
-      } else if (rows[0].votes < 0) {
-        rows[0].votes = 0;
       }
       return rows[0];
     });
