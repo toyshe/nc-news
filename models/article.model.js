@@ -22,7 +22,7 @@ exports.findArticles = (
   limit = 10,
   p
 ) => {
-  const validSortQueries = ["title", "author", "created_at", "votes"];
+  const validSortQueries = ["title", "author", "created_at", "votes", "comment_count"];
   if (!validSortQueries.includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "Invalid sort_by query" });
   }
