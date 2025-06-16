@@ -49,7 +49,6 @@ exports.findArticles = (
   if (p) {
     queryStr += ` LIMIT ${limit} OFFSET ${limit * (p - 1)}`;
   }
-
   return db.query(queryStr, queryParameters).then(({ rows }) => {
     return rows;
   });
