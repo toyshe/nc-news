@@ -129,6 +129,7 @@ describe("app", () => {
         .then(({ body }) => {
           console.log(body.article);
           expect(body.article).toMatchObject(expectedOutput);
+          expect(new Date(body.article.created_at)).toBeInstanceOf(Date);
         });
     });
     test("PATCH 400: return Invalid Vote if an invalid votes is given to be updated", () => {

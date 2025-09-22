@@ -19,16 +19,43 @@ jobs:
   test-app:
     needs: test-utils
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14   # pick version that matches your local dev
+        env:
+          POSTGRES_DB: nc_news_test
+          POSTGRES_USER: toyshe
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U toyshe -d nc_news_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.6.0
-      - name: Setup PSQL
-        uses: harmon758/postgresql-action@v1
-        with: 
-          postgresql db: nc_news_test
-          postgresql user: toyshe
-          postgresql password: password
+        uses: actions/checkout@v3
       - name: Install dependencies
-        run: npm install
-      - name: Test app
-        run: PGDATABASE=nc_news_test PGUSER=toyshe PGPASSWORD=password npm test
+        run: npm ci
+      - name: Run tests
+        env:
+          PGHOST: localhost
+          PGPORT: 5432
+          PGDATABASE: nc_news_test
+          PGUSER: toyshe
+          PGPASSWORD: password
+        run: npm test
+    # steps:
+    #   - name: Checkout
+    #     uses: actions/checkout@v3.6.0
+    #   - name: Setup PSQL
+    #     uses: harmon758/postgresql-action@v1
+    #     with: 
+    #       postgresql db: nc_news_test
+    #       postgresql user: toyshe
+    #       postgresql password: password
+    #   - name: Install dependencies
+    #     run: npm install
+    #   - name: Test app
+    #     run: PGDATABASE=nc_news_test PGUSER=toyshe PGPASSWORD=password npm test
