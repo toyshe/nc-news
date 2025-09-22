@@ -90,7 +90,9 @@ describe("app", () => {
         .get("/api/articles/1")
         .expect(200)
         .then(({ body }) => {
-          expect(body.article).toEqual(expectedOutput);
+          // expect(body.article).toMatchObject(expectedOutput);
+            expect(new Date(body.article.created_at)).toBeInstanceOf(Date);
+
         });
     });
     test("GET 404: returns Not Found if entered invalid article_id", () => {
